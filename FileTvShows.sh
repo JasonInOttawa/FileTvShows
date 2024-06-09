@@ -22,7 +22,12 @@ fi
 
 echo Filing $source in $destination
 
-files=`find "$source" -not -path '*/.*' -type f -iname "*.mkv" -o -iname "*.mp4" -o -iname "*.m4v"`
+files=`find "$source" -not -path '*/.*' -type f -iname "*.mkv" -o -iname "*.mp4" -o -iname "*.m4v" -o -iname "*.avi"`
+echo FILES ARE $files
+if [[ $files == "" ]]; then
+        echo Nothing to do
+        exit 0
+fi
 # deal with spaces in filenames
 IFS=$(echo -en "\n\b")
 for filein in $files; do
@@ -60,3 +65,10 @@ for filein in $files; do
                 fi
         fi
 done
+
+echo Fix up permissions so Jellyfin can delete stuff
+chmod -R 777 $destinationDirectory
+if [[ $? -ne 0 ]]; then
+        echo Changing permissions on $destinationDirectory failed
+        exit 5
+fi
