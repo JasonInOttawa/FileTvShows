@@ -36,7 +36,7 @@ for filein in $files; do
         if [[ `expr match "$filename" '.*[sS][0-9][0-9]'` -eq 0 ]]; then
                 echo Unable to extract showname from $filename -- skipping
         else
-                showname=${filename%[.,\ ][s,S][0-9][0-9]*}
+                showname=${filename%[.,\ -][s,S][0-9][0-9]*}
                 #Fix filenames
                 #Code cribbed from tvtorrentorganizer / tvtorrentorganizer on github
                 showname=${showname//./ } #Change all . to spaces
@@ -50,7 +50,8 @@ for filein in $files; do
 
                 if [[ ! -d $destinationDirectory ]]; then
                         echo Creating $destinationDirectory
-                        mkdir "$destinationDirectory"
+                        # Set permissions to allow Jellyfin to delete items
+                        mkdir -m 777 "$destinationDirectory"
                         if [[ $? -ne 0 ]]; then
                                 echo mkdir $destinationDirectory failed exiting
                                 exit 3
@@ -65,10 +66,3 @@ for filein in $files; do
                 fi
         fi
 done
-
-echo Fix up permissions so Jellyfin can delete stuff
-chmod -R 777 $destinationDirectory
-if [[ $? -ne 0 ]]; then
-        echo Changing permissions on $destinationDirectory failed
-        exit 5
-fi
